@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  // turn this off to avoid duplicate requests to openai
+  reactStrictMode: false,
 }
 
 module.exports = nextConfig

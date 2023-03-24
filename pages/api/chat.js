@@ -8,14 +8,79 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
+const fs = require('fs');
+const yaml = require('js-yaml');
+
+const file = fs.readFileSync('./config.yaml', 'utf8');
+const config = yaml.load(file);
+
+const Database = require("@replit/database")
+const db = new Database()
+const claimsDBKey = "claims"
+
 export default async function(req, res) {
+  var messages;
+  if (req.body == null) {
+    messages = []
+  } else {
+    messages = req.body.messages
+  }
+  
   const completion = await openai.createChatCompletion({
-    // You need early access to GPT-4, otherwise use "gpt-3.5-turbo"
-    // Downgraded to GPT-4 due to high traffic. Sorry for the inconvenience.
     model: "gpt-4",
-    messages: [{ "role": "system", "content": "You are a helpful assistant. Start by complimenting the user." }].concat(req.body.messages)
-
+    messages: [{ "role": "system", "content": config.initialPrompt}].concat(messages)
   });
-  res.status(200).json({ result: completion.data.choices[0].message })
+  const openai_response = completion.data.choices[0].message.content.trim()
+  // const openai_response = "DUMMY RESPONSE"
 
+  if (openai_response.includes('IAMDONE')) {
+    if (parseTable(openai_response)) {
+      res.status(201).json({ result: config.thankYouMessage})
+    } else {
+      res.status(500)
+    }
+  } else {
+    res.status(200).json({ result: openai_response})
+  }
+}
+
+function storeClaim(claim_dict) {
+  db.get(claimsDBKey).then(existing_values => {
+    if (existing_values == null) {
+      db.set(claimsDBKey, [claim_dict]).then(() => {
+        console.log("initial claim stored in DB");
+      });
+    } else {
+      db.set(claimsDBKey, existing_values.concat(claim_dict)).then(() => {
+        console.log("claim stored in DB");
+      });
+    }
+  });
+}
+
+function parseTable(inputString, claimsDataFile) {
+  // Split the input string on newlines
+  let lines = inputString.split('\n');
+
+  // Filter out any lines that do not contain exactly three '|' characters
+  lines = lines.filter(line => line.split('|').length - 1 === 3);
+
+  if (lines.length <= 2) {
+    return false;
+  }
+
+  // Filter out the first two (header) lines
+  let rows = lines.slice(2);
+
+  // Extract the first and second values from each row
+  let data = {};
+  for (let row of rows) {
+    let values = row.split('|').slice(1, -1);
+    let key = values[0].trim();
+    let value = values[1].trim();
+    data[key] = value;
+  }
+
+  storeClaim(data);
+  return true;
 }

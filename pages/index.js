@@ -10,7 +10,6 @@ export default function Home() {
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Hi there! How can I help?" }
   ]);
 
   const messageListRef = useRef(null);
@@ -22,28 +21,61 @@ export default function Home() {
     messageList.scrollTop = messageList.scrollHeight;
   }, [messages]);
 
-  // Focus on text field on load
   useEffect(() => {
+    textAreaRef.current.focus();
+    initMessages();
     textAreaRef.current.focus();
   }, []);
 
   // Handle errors
   const handleError = () => {
+    console.log("Error")
     setMessages((prevMessages) => [...prevMessages, { role: "assistant", content: "Oops! There seems to be an error. Please try again." }]);
     setLoading(false);
     setUserInput("");
   }
 
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const initMessages = async () => {
+    console.log("calling initMessages")
+    setLoading(true);
 
-    if (userInput.trim() === "") {
+    // Send chat history to API
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(null),
+    });
+
+    const data = await response.json();
+    
+    if (!data) {
+      handleError();
       return;
     }
 
+    setMessages((prevMessages) => [{ role: "assistant", content: data.result }]);
+    setLoading(false);
+    textAreaRef.current.focus();
+  };
+  
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    console.log("calling handleSubmit")
+    e.preventDefault();
+
+    const input_str = userInput.trim()
+    
+    if (input_str === "") {
+      return;
+    }
+
+    // Reset user input
+    setUserInput("");
+
     setLoading(true);
-    const context = [...messages, { role: "user", content: userInput }];
+    const context = [...messages, { role: "user", content: input_str }];
     setMessages(context);
 
     // Send chat history to API
@@ -55,9 +87,6 @@ export default function Home() {
       body: JSON.stringify({ messages: context }),
     });
 
-    // Reset user input
-    setUserInput("");
-
     const data = await response.json();
 
     if (!data) {
@@ -65,9 +94,9 @@ export default function Home() {
       return;
     }
 
-    setMessages((prevMessages) => [...prevMessages, { role: "assistant", content: data.result.content }]);
+    setMessages((prevMessages) => [...prevMessages, { role: "assistant", content: data.result }]);
     setLoading(false);
-
+    textAreaRef.current.focus();
   };
 
   // Prevent blank submissions and allow for multiline input
@@ -91,7 +120,7 @@ export default function Home() {
       </Head>
       <div className={styles.topnav}>
         <div className={styles.navlogo}>
-          <Image src="/frontier_insurance.jpg" width="150" height="150" />
+          <Image src="/frontier_insurance.jpg" width="150" height="168" alt="logo for fake insurance company" />
           <a href="/">Frontier Insurance</a>
         </div>
       </div>
@@ -103,7 +132,7 @@ export default function Home() {
                 // The latest message sent by the user will be animated while waiting for a response
                 <div key={index} className={message.role === "user" && loading && index === messages.length - 1 ? styles.usermessagewaiting : message.role === "assistant" ? styles.apimessage : styles.usermessage}>
                   {/* Display the correct icon depending on the message type */}
-                  {message.role === "assistant" ? <Image src="/openai.png" alt="AI" width="30" height="30" className={styles.boticon} priority={true} /> : <Image src="/usericon.png" alt="Me" width="30" height="30" className={styles.usericon} priority={true} />}
+                  {message.role === "assistant" ? <Image src="/frontier_insurance.jpg" alt="AI" width="30" height="30" className={styles.boticon} priority={true} /> : <Image src="/usericon.png" alt="Me" width="30" height="33" className={styles.usericon} priority={true} />}
                   <div className={styles.markdownanswer}>
                     {/* Messages are being rendered in Markdown format */}
                     <ReactMarkdown linkTarget={"_blank"}>{message.content}</ReactMarkdown>
@@ -127,7 +156,7 @@ export default function Home() {
                 type="text"
                 id="userInput"
                 name="userInput"
-                placeholder={loading ? "Waiting for response..." : "Type your question..."}
+                placeholder={loading ? "Waiting for Frontier Insurance..." : "Your response here..."}
                 value={userInput}
                 onChange={e => setUserInput(e.target.value)}
                 className={styles.textarea}
@@ -147,7 +176,7 @@ export default function Home() {
           </div>
           <div className={styles.footer}>
             <p>Created by<br />
-            <Image src="/calamity_contingent_meme.jpeg" width="150" height="150" />
+            <Image src="/calamity_contingent_meme.jpeg" width="150" height="150" alt="epic hackathon collective" />
             </p>
           </div>
         </div>

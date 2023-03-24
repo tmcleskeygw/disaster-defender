@@ -18,6 +18,5 @@ initialPrompt: |-
 
 agentName: Sandy
 
-thankYouMessage: Thank you for your information.
-errorMessage: Something unexpected happened. Someone should be in contact.
-
+thankYouMessage: Thank you. Your claim information has been recorded and you may close this tab when you are done.
+errorMessage: Something unexpected happened in our system. Please try again.
