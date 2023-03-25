@@ -19,24 +19,28 @@ const db = new Database()
 const claimsDBKey = "claims"
 
 export default async function(req, res) {
-  var messages;
   if (req.body == null) {
-    messages = []
-  } else {
-    messages = req.body.messages
+    res.status(200).json({ result: config.assistantIntroMessage})
+    return
   }
-  
+
+  const message_payload = [{ "role": "system", "content": config.systemPrompt}].concat(req.body.messages)
+  // console.log(message_payload)
   const completion = await openai.createChatCompletion({
-    model: "gpt-4",
-    messages: [{ "role": "system", "content": config.initialPrompt}].concat(messages)
+    //model: "gpt-4", // 3 cents/thousand tokens
+    model: "gpt-3.5-turbo", // .2 cents/thousand tokens
+    messages: message_payload
   });
   const openai_response = completion.data.choices[0].message.content.trim()
   // const openai_response = "DUMMY RESPONSE"
 
   if (openai_response.includes('IAMDONE')) {
+    console.log("Received response including claim details: " + openai_response);
     if (parseTable(openai_response)) {
+      console.log("Response parsed successfully");
       res.status(201).json({ result: config.thankYouMessage})
     } else {
+      console.log("Response failed to be parsed as table");
       res.status(500)
     }
   } else {
