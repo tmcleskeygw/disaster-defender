@@ -35,14 +35,9 @@ export default async function(req, res) {
   // const openai_response = "DUMMY RESPONSE"
 
   if (openai_response.includes('IAMDONE')) {
+    // for now just log
     console.log("Received response including claim details: " + openai_response);
-    if (parseTable(openai_response)) {
-      console.log("Response parsed successfully");
-      res.status(201).json({ result: config.thankYouMessage})
-    } else {
-      console.log("Response failed to be parsed as table");
-      res.status(500)
-    }
+    res.status(200).json({ result: config.thankYouMessage})
   } else {
     res.status(200).json({ result: openai_response})
   }
