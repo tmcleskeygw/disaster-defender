@@ -31,15 +31,15 @@ export default async function(req, res) {
 
   const message_payload = [{ "role": "system", "content": config.systemPrompt }].concat(formatMessages(req.body.messages))
   const completion = await openai.createChatCompletion({
-    //model: "gpt-4", // 3 cents/thousand tokens
-    model: "gpt-3.5-turbo", // .2 cents/thousand tokens
+    model: "gpt-4", // 3 cents/thousand tokens
+    // model: "gpt-3.5-turbo", // .2 cents/thousand tokens
     messages: message_payload
   });
   const openai_response = completion.data.choices[0].message.content.trim()
 
   if (openai_response.includes('IAMDONE')) {
     // for now just log
-    console.log("Received response including claim details: " + openai_response);
+    console.log("Received response including claim details: " + openai_response.replace('IAMDONE|',''));
     res.status(200).json({ result: config.thankYouMessage })
   }
   else {

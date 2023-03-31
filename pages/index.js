@@ -14,7 +14,6 @@ export default function Home() {
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [claimCreated, setClaimCreated] = useState(false);
 
   const messageListRef = useRef(null);
   const textAreaRef = useRef(null);
@@ -74,7 +73,6 @@ export default function Home() {
   };
 
   const initMessages = async () => {
-
     setLoading(true);
 
     // Send chat history to API
@@ -149,39 +147,41 @@ export default function Home() {
   //get the google maps link for the given location
   const getLink = (location) => {
     console.log('location: ' + location)
-    if (location === 'Roblox Building') {
-      return 'https://www.google.com/maps/dir//970+Park+Pl,San+Mateo,+CA+94403';
-    } else if (location === 'Whole Foods') {
-      return 'https://www.google.com/maps/dir//1010+Park+Pl,San+Mateo,+CA+94403';
+    if (location === 'WinterSpringsHighSchool') {
+      return ['Winter Springs High School', 'https://goo.gl/maps/VAeXyZgqJuH3Phce9'];
+    } else if (location === 'WinterSpringsCivicCenter') {
+      return ['Winter Springs Civic Center', 'https://goo.gl/maps/dNhYFdh3EZcAYJbf8'];
+    } else if (location === 'OviedoMall') {
+      return ['Oviedo Mall', 'https://goo.gl/maps/eAW7JN7VRWdzFK3TA'];
     } else {
-      return 'https://www.google.com/maps/dir//1221+Chess+Dr,Foster+City,+CA+94403';
+      return null
     }
+  }
+
+  const claimWasCreated = () => {
+    if (messages && messages[0] && messages[messages.length - 1].content === 'Your claim has been filed, and your claim number is 356-71-1234. Thank you. A field inspector will be in your area soon.') {
+      return true;
+    }
+    return false;
   }
 
   const formatContent = (message, isLatestMessage) => {
     let { role, content, images } = message;
     if (role === "assistant") {
 
-      //If claim has been filed:
-      //TODO: don't hardcode this
-      if (content === 'Your claim has been filed, and your claim number is 356-71-1234. Thank you. A field inspector will be in your area soon.' && !claimCreated) {
-        setClaimCreated(true);
-      }
-
       content = reactStringReplace(content, "https://guidewire_fake.com", (match, i) => {
-        return (
-          <span className="btn-file" title="">
+        return (<span className="btn-file" title="">
             Select <input type="file" accept="image/*" multiple onChange={onImageChange} disabled={!isLatestMessage} />
-          </span>
-        )
+          </span>)
       });
 
       // Remove << and >> and capitalize and turn into google maps link
       content = reactStringReplace(content, /"?<<([a-zA-Z\s]+)>>"?/, (match, i) => {
-        const capitalizedLocation = match.split(" ")
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ");
-        return (<a href={getLink(match)}>{capitalizedLocation}</a>);
+        // const capitalizedLocation = match.split(" ")
+        //   .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        //   .join(" ");
+        const link = getLink(match)
+        return (<a href={link[1]} target="_blank">{link[0]}</a>);
       });
     } else {
       //format images
@@ -222,8 +222,7 @@ export default function Home() {
       <div className={styles.topnav}>
         <div className={styles.navlogo}>
           <Image src="/frontier_insurance.jpg" width="150" height="168" alt="logo for fake insurance company" />
-          <a href="/">Disaster Defender</a>
-
+          <span>Disaster Defender</span>
         </div>
       </div>
       <main className={styles.main}>
@@ -246,7 +245,7 @@ export default function Home() {
             })}
           </div>
         </div>
-        {claimCreated && <Particles options={options} init={customInit} />}
+        {claimWasCreated() && <Particles options={options} init={customInit} />}
         <div className={styles.center}>
           <div className={styles.cloudform}>
             <form onSubmit={handleSubmit}>
@@ -278,7 +277,14 @@ export default function Home() {
             </form>
           </div>
           <div className={styles.footer}>
-            <p>Created by<br />
+            <p>Created for the 2023 Guidewire AI Science Fair</p>
+            <p>
+              <span className={styles.name}>Simon Reading</span>&nbsp;|&nbsp;
+              <span className={styles.name}>Parker Sorenson</span>&nbsp;|&nbsp;
+              <span className={styles.name}>Travis McLeskey</span>&nbsp;|&nbsp;
+              <span className={styles.name}>Messiha Sherwin</span>
+            </p>
+            <p>
               <Image src="/calamity_contingent_meme.jpeg" width="150" height="150" alt="epic hackathon collective" />
             </p>
           </div>
