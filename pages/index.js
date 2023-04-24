@@ -170,7 +170,8 @@ export default function Home() {
     if (role === "assistant") {
 
       content = reactStringReplace(content, "https://guidewire_fake.com", (match, i) => {
-        return (<span className="btn-file" title="">
+        return (
+          <span className="btn-file" title="">
             Select <input type="file" accept="image/*" multiple onChange={onImageChange} disabled={!isLatestMessage} />
           </span>)
       });
@@ -221,7 +222,8 @@ export default function Home() {
       </Head>
       <div className={styles.topnav}>
         <div className={styles.navlogo}>
-          <Image src="/frontier_insurance.jpg" width="150" height="168" alt="logo for fake insurance company" />
+          <Image src="/frontier_insurance.jpg"
+            width="135" height="151" alt="logo for fake insurance company" />
           <span>Disaster Defender</span>
         </div>
       </div>
@@ -278,6 +280,9 @@ export default function Home() {
           </div>
           <div className={styles.footer}>
             <p>Created for the 2023 Guidewire AI Science Fair</p>
+            <p>
+              <a href="https://drive.google.com/file/d/10AFUCS4XComBA2_MbS25uZ0rAXCMElLE/view?usp=sharing">Submission Video</a>
+            </p>
             <p>
               <span className={styles.name}>Simon Reading</span>&nbsp;|&nbsp;
               <span className={styles.name}>Parker Sorenson</span>&nbsp;|&nbsp;

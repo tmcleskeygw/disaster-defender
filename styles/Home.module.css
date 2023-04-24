@@ -40,16 +40,21 @@
 /* Mobile styles */
 @media only screen and (max-width: 600px) {
   .navlogo {
-    font-size: 2.85rem;
+    font-size: 0.5rem;
     margin-left: 1rem;
   }
 
   .textarea {
-    font-size: 2.1rem;
+    font-size: 1.2rem;
   }
 
   .markdownanswer {
-    font-size: 1.4rem;
+    font-size: 1.00rem;
+  }
+
+  .name {
+    font-weight: bold;
+    font-size: 0.9rem !important;
   }
 }
 
@@ -269,12 +274,13 @@
 
 .name {
   font-weight: bold;
-  font-size: 1.4rem;
+  font-size: 1.1rem;
 }
 
 .footer a {
   font-weight: 500;
-  color: #7a7d81;
+  font-size: 2rem;
+  color: blue;
 }
 
 .footer a:hover {
@@ -303,7 +309,7 @@
   }
 
 .navlogo {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   width: 20rem;
 }
 
@@ -345,10 +351,8 @@
   overflow-x:auto;
 }
 
-
-
 /* temporary overrides */
-.navlogo span {
+/* .navlogo span {
   font-size: 2.3em;
 }
 .navlogo img {
@@ -367,3 +371,4 @@
 .apimessage img {
   margin-top: 10px;
 }
+ */

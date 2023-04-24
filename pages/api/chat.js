@@ -25,21 +25,21 @@ export default async function(req, res) {
   }
 
   //If user uploaded images, add a message to tell the bot that the user uploaded images
-  if(req.body.messages[req.body.messages.length-1].content === "IMAGESTOUPLOAD"){
-    req.body.messages[req.body.messages.length-1].content = "Here are images of the damage for the claim";
+  if (req.body.messages[req.body.messages.length - 1].content === "IMAGESTOUPLOAD") {
+    req.body.messages[req.body.messages.length - 1].content = "Here are images of the damage for the claim";
   }
 
   const message_payload = [{ "role": "system", "content": config.systemPrompt }].concat(formatMessages(req.body.messages))
   const completion = await openai.createChatCompletion({
-    model: "gpt-4", // 3 cents/thousand tokens
-    // model: "gpt-3.5-turbo", // .2 cents/thousand tokens
+    // model: "gpt-4", // 3 cents/thousand tokens
+    model: "gpt-3.5-turbo", // .2 cents/thousand tokens
     messages: message_payload
   });
   const openai_response = completion.data.choices[0].message.content.trim()
 
   if (openai_response.includes('IAMDONE')) {
     // for now just log
-    console.log("Received response including claim details: " + openai_response.replace('IAMDONE|',''));
+    console.log("Received response including claim details: " + openai_response.replace('IAMDONE|', ''));
     res.status(200).json({ result: config.thankYouMessage })
   }
   else {
@@ -88,7 +88,7 @@ function parseTable(inputString, claimsDataFile) {
   return true;
 }
 
-function formatMessages(messages){
+function formatMessages(messages) {
   const allowed = ['role', 'content'];
   return messages.map(message => {
     return Object.keys(message)
